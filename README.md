@@ -1,4 +1,4 @@
-# flutter_ia_translator
+# flutter_ia_examples
 
 A new Flutter project.
 
