@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:lottie/lottie.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'main.dart';
 
@@ -14,7 +19,11 @@ class StoryTellingScreen extends StatefulWidget {
 class _StoryTellingScreenState extends State<StoryTellingScreen> {
   List<String> selectedItems = [];
   bool showStory = false;
+  bool _speachIsReady = false;
+  late Uint8List audioBytes;
   String story = '';
+  final AudioPlayer audioPlayer = AudioPlayer();
+  bool playing = false;
 
   final List<Map<String, dynamic>> icons = [
     {'icon': Icons.shield, 'name': 'caballero'},
@@ -42,21 +51,17 @@ class _StoryTellingScreenState extends State<StoryTellingScreen> {
       apiKey: yourAPIKey,
     );
 
-    print('no prompt');
-
     final prompt =
-        'Crea una historia, donde ${selectedItems.first} sea el personaje principal, ${selectedItems[1]} te ayude a darle sentido a la historia y ${selectedItems.last} sea el antagonista, agregale una intro, luego un nudo y por ultimo un desenlace, es una historia para niños';
-    print('no funciona');
-    final content = [Content.text(prompt)];
-    print('no content');
-    final response = await model.generateContent(content);
+        'Crea una historia, donde ${selectedItems.first} sea el personaje principal, ${selectedItems[1]} te ayude a darle sentido a la historia y ${selectedItems.last} sea el antagonista, agregale una intro, luego un nudo y por ultimo un desenlace, es una historia para niños. Si creas personajes colocales un nombre propio.';
 
-    print('no funciona');
+    final content = [Content.text(prompt)];
+
+    final response = await model.generateContent(content);
 
     setState(() {
       story = response.text ?? '';
     });
-    // return "Había una vez un ${selectedItems.join(', ')} en una gran aventura.";
+    speakWithElevenLabs(story);
   }
 
   @override
@@ -76,6 +81,46 @@ class _StoryTellingScreenState extends State<StoryTellingScreen> {
                             'assets/story_animation.json',
                             width: MediaQuery.of(context).size.width,
                           ),
+                          _speachIsReady
+                              ? ElevatedButton(
+                                onPressed:
+                                    story != ''
+                                        ? () {
+                                          if (playing) {
+                                            audioPlayer.stop();
+                                            setState(() {
+                                              playing = false;
+                                            });
+                                          } else {
+                                            audioPlayer.play(
+                                              BytesSource(audioBytes),
+                                            );
+                                            setState(() {
+                                              playing = true;
+                                            });
+                                          }
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.purple,
+                                ),
+                                child: Shimmer.fromColors(
+                                  baseColor: Colors.yellow,
+                                  highlightColor: Colors.pink,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        playing
+                                            ? Icons.pause
+                                            : Icons.play_arrow,
+                                      ),
+                                      Text(playing ? 'Pausa' : 'Reproducir'),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : CircularProgressIndicator(),
                           Expanded(
                             child: SingleChildScrollView(
                               padding: EdgeInsets.all(16),
@@ -130,6 +175,7 @@ class _StoryTellingScreenState extends State<StoryTellingScreen> {
                       }),
                     ),
           ),
+
           if (!showStory)
             ElevatedButton(
               onPressed: selectedItems.length == 3 ? generateStory : null,
@@ -163,5 +209,37 @@ class _StoryTellingScreenState extends State<StoryTellingScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> speakWithElevenLabs(String text) async {
+    const String apiKey = ""; // Reemplaza con tu clave real
+    const String voiceId =
+        "EXAVITQu4vr4xnSDxMaL"; // ID de voz (elige una desde la web)
+
+    final url = Uri.parse(
+      "https://api.elevenlabs.io/v1/text-to-speech/$voiceId",
+    );
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json", "xi-api-key": apiKey},
+      body: jsonEncode({
+        "text": text,
+        "language_code": 'es',
+        "model_id": "eleven_flash_v2_5", // Modelo de voz
+        "voice_settings": {
+          "stability": 0.5, // Ajusta estabilidad de la voz
+          "similarity_boost": 0.8, // Ajusta naturalidad
+        },
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      audioBytes = response.bodyBytes;
+      _speachIsReady = true;
+      setState(() {});
+    } else {
+      print("Error: ${response.statusCode} - ${response.body}");
+    }
   }
 }
