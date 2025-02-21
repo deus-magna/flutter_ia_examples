@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ia_translator/main.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
@@ -14,7 +15,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final model = GenerativeModel(
     model: 'gemini-1.5-flash-latest',
-    apiKey: 'AIzaSyBUhhmdrsSSSI9MX0YR39hN2DQI4wgfmIo',
+    apiKey: yourAPIKey,
   );
 
   void _sendMessage() async {

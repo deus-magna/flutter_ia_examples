@@ -6,6 +6,8 @@ import 'package:flutter_ia_translator/temperature_controller.dart';
 import 'package:flutter_ia_translator/translator_screen.dart';
 import 'package:go_router/go_router.dart';
 
+const String yourAPIKey = '';
+
 void main() {
   runApp(MyApp());
 }

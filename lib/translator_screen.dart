@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ia_translator/main.dart' show yourAPIKey;
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class TranslatorScreen extends StatefulWidget {
   const TranslatorScreen({super.key});
 
   @override
-  _TranslatorScreenState createState() => _TranslatorScreenState();
+  State<TranslatorScreen> createState() => _TranslatorScreenState();
 }
 
 class _TranslatorScreenState extends State<TranslatorScreen> {
   final model = GenerativeModel(
     model: 'gemini-1.5-flash-latest',
-    apiKey: 'AIzaSyBUhhmdrsSSSI9MX0YR39hN2DQI4wgfmIo',
+    apiKey: yourAPIKey,
   );
 
   final TextEditingController _controller = TextEditingController();

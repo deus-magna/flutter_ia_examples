@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:lottie/lottie.dart';
 
+import 'main.dart';
+
 class StoryTellingScreen extends StatefulWidget {
   const StoryTellingScreen({super.key});
 
   @override
-  _StoryTellingScreenState createState() => _StoryTellingScreenState();
+  State<StoryTellingScreen> createState() => _StoryTellingScreenState();
 }
 
 class _StoryTellingScreenState extends State<StoryTellingScreen> {
@@ -37,7 +39,7 @@ class _StoryTellingScreenState extends State<StoryTellingScreen> {
   Future<void> createStory() async {
     final model = GenerativeModel(
       model: 'gemini-1.5-flash-latest',
-      apiKey: 'AIzaSyBUhhmdrsSSSI9MX0YR39hN2DQI4wgfmIo',
+      apiKey: yourAPIKey,
     );
 
     print('no prompt');

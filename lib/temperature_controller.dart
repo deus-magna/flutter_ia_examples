@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import 'main.dart';
+
 class TemperatureController extends StatefulWidget {
+  const TemperatureController({super.key});
+
   @override
-  _TemperatureControllerState createState() => _TemperatureControllerState();
+  State<TemperatureController> createState() => _TemperatureControllerState();
 }
 
 class _TemperatureControllerState extends State<TemperatureController> {
@@ -14,7 +18,7 @@ class _TemperatureControllerState extends State<TemperatureController> {
   void _convertTemperature() async {
     final model = GenerativeModel(
       model: 'gemini-1.5-flash-latest',
-      apiKey: 'AIzaSyBUhhmdrsSSSI9MX0YR39hN2DQI4wgfmIo',
+      apiKey: yourAPIKey,
     );
 
     double? celsius = double.tryParse(_controller.text);
@@ -24,7 +28,7 @@ class _TemperatureControllerState extends State<TemperatureController> {
       final content = [Content.text(prompt)];
 
       final response = await model.generateContent(content);
-      print(response.text);
+
       _fahrenheit = double.tryParse(response.text!);
     } else {
       _fahrenheit = null;
